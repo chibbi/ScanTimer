@@ -159,7 +159,7 @@
         );
         const total = Math.max(
           1,
-          parseInt(settings.totalPositions, 10) || 2500,
+          parseInt(settings.totalPositions, 10) || 0,
         );
 
         let start = settings.startTime ? new Date(settings.startTime) : null;
