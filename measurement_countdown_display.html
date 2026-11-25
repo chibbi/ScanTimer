@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Measurement Countdown Display</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --blue: #38bdf8;
+        --blue2: #0ea5e9;
+        --muted: #cbd5e1;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+      }
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 28px;
+        background: linear-gradient(135deg, #1a1a1a, #2d3748);
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: #fff;
+      }
+
+      .container {
+        width: min(760px, 100%);
+        padding: 40px;
+        font-size: 26px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 24px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.34);
+      }
+      .scan-type {
+        font-size: 1rem;
+        color: var(--muted);
+        margin-bottom: 14px;
+        letter-spacing: 0.04em;
+        text-align: center;
+      }
+      .timer {
+        font-size: clamp(2.6rem, 8vw, 5rem);
+        font-weight: 700;
+        margin-bottom: 20px;
+        letter-spacing: 0.04em;
+        line-height: 1.05;
+        text-align: center;
+      }
+      .scan-count {
+        font-size: 1rem;
+        color: #7dd3fc;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+      .progress {
+        width: 100%;
+        height: 16px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 999px;
+        overflow: auto;
+        margin: 0 auto;
+      }
+      .bar {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, var(--blue), var(--blue2));
+        transition: width 0.7s linear;
+      }
+      .details {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 1rem;
+      }
+      .message {
+        margin-top: 18px;
+        color: #94a3b8;
+        font-size: 0.9rem;
+      }
+      .done .timer,
+      .done .scan-count {
+        color: #86efac;
+      }
+      .done .bar {
+        background: linear-gradient(90deg, #22c55e, #86efac);
+      }
+      @media (max-width: 600px) {
+        .details {
+          display: block;
+        }
+        .details div {
+          margin-top: 7px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" id="container">
+      <div class="scan-type" id="scanType">Unloaded</div>
+      <div class="timer" id="timer">00:00:00</div>
+      <div class="scan-count" id="scanCount">0 / 0 Scan Positions</div>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <div class="details">
+        <div id="percent">0.0% complete</div>
+        <div id="finishTime">Expected finish: --</div>
+      </div>
+      <div class="message" id="message"></div>
+    </div>
+    <script>
+      const $ = (id) => document.getElementById(id);
+
+      // Same localStorage keys and data structure as measurement_countdown.html.
+      const STORAGE_KEYS = [
+        "measurementSettings",
+        "scanTypes",
+        "selectedScanType",
+        "timingOverrides",
+      ];
+
+      const FALLBACK_TYPES = [
+        { name: "Could not load Server Presets", defaultSeconds: 19.25 },
+      ];
+
+      function load(key, fallback) {
+        try {
+          return JSON.parse(localStorage.getItem(key)) ?? fallback;
+        } catch {
+          return fallback;
+        }
+      }
+
+      function getState() {
+        const settings = load("measurementSettings", {});
+        const types = load("scanTypes", FALLBACK_TYPES);
+        const selectedName = localStorage.getItem("selectedScanType");
+        const selectedType =
+          (Array.isArray(types) &&
+            types.find((type) => type.name === selectedName)) ||
+          (Array.isArray(types) && types[0]) ||
+          FALLBACK_TYPES[0];
+
+        const overrides = load("timingOverrides", {});
+        const override = overrides?.[selectedType.name];
+        const seconds = Number(
+          override?.seconds || selectedType.defaultSeconds || 19.25,
+        );
+        const total = Math.max(
+          1,
+          parseInt(settings.totalPositions, 10) || 2500,
+        );
+
+        let start = settings.startTime ? new Date(settings.startTime) : null;
+        if (!start || Number.isNaN(start.getTime())) start = new Date();
+
+        return {
+          typeName: selectedType.name,
+          seconds: seconds > 0 && Number.isFinite(seconds) ? seconds : 19.25,
+          total,
+          start,
+        };
+      }
+
+      function update() {
+        const state = getState();
+        $("scanType").textContent = state.typeName;
+
+        const duration = state.total * state.seconds * 1000;
+        const end = new Date(state.start.getTime() + duration);
+        const now = Date.now();
+        const elapsed = Math.max(
+          0,
+          Math.min(now - state.start.getTime(), duration),
+        );
+        const progress = duration > 0 ? elapsed / duration : 0;
+        const remaining = Math.max(0, duration - elapsed);
+
+        const hours = Math.floor(remaining / 3600000);
+        const minutes = Math.floor((remaining % 3600000) / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
+
+        $("timer").textContent = [hours, minutes, seconds]
+          .map((value) => String(value).padStart(2, "0"))
+          .join(":");
+
+        let current =
+          now < state.start.getTime()
+            ? 0
+            : Math.min(
+                state.total,
+                Math.floor(elapsed / (state.seconds * 1000)) + 1,
+              );
+        if (remaining <= 0) current = state.total;
+
+        $("scanCount").textContent =
+          `${current} / ${state.total} Scan Positions`;
+        $("bar").style.width = `${progress * 100}%`;
+        $("percent").textContent = `${(progress * 100).toFixed(1)}% complete`;
+        $("finishTime").textContent =
+          `Expected finish: ${end.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "medium" })}`;
+
+        $("container").classList.toggle("done", remaining <= 0);
+        $("message").textContent =
+          now < state.start.getTime()
+            ? "Measurement has not started yet."
+            : remaining <= 0
+              ? "Measurement complete."
+              : "";
+      }
+
+      // The storage event updates immediately for changes made in another tab.
+      window.addEventListener("storage", (event) => {
+        if (!event.key || STORAGE_KEYS.includes(event.key)) update();
+      });
+
+      // Polling also picks up changes made by the full app in the same tab.
+      setInterval(update, 1000);
+
+      document.addEventListener("dblclick", () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen?.();
+        } else {
+          document.exitFullscreen?.();
+        }
+      });
+
+      update();
+    </script>
+  </body>
+</html>

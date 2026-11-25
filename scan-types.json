@@ -1,0 +1,8 @@
+{
+  "scanTypes": [
+    {
+      "name": "FPA-Reflection",
+      "defaultSeconds": 19.25
+    }
+  ]
+}
