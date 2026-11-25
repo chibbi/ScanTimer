@@ -489,7 +489,7 @@
         $("finishTime").textContent =
           `Expected finish: ${end.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "medium" })}`;
       }
-      $("saveMeasurement").onclick = () => {
+      updateSettings = () => {
         settings = {
           totalPositions: Math.max(1, parseInt($("totalPositions").value) || 1),
           startTime: $("startTime").value,
@@ -501,13 +501,12 @@
       };
       // Save measurement settings automatically whenever either setting changes.
       ["startTime", "totalPositions"].forEach((id) => {
-        $(id).addEventListener("input", () => $("saveMeasurement").click());
-        $(id).addEventListener("change", () => $("saveMeasurement").click());
+        $(id).addEventListener("input", () => updateSettings());
+        $(id).addEventListener("change", () => updateSettings());
       });
 
       $("startNow").onclick = () => {
         $("startTime").value = localInputValue(new Date());
-        $("saveMeasurement").click();
       };
       $("scanType").onchange = showType;
       $("startTiming").onclick = () => {
