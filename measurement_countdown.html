@@ -40,9 +40,6 @@
         backdrop-filter: blur(12px);
         margin-bottom: 18px;
       }
-      .hero {
-        text-align: center;
-      }
       .timer {
         font-size: clamp(3rem, 9vw, 5.5rem);
         font-weight: 700;
@@ -121,18 +118,35 @@
         background: #9f1239;
       }
       .actions {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
         gap: 10px;
-        flex-wrap: wrap;
         margin-top: 16px;
       }
+      .actions button {
+        width: 100%;
+        min-width: 0;
+      }
       .type-head {
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) repeat(2, minmax(150px, auto));
         align-items: end;
         gap: 12px;
       }
       .type-head > div {
-        flex: 1;
+        min-width: 0;
+      }
+      .timing-controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr));
+        align-items: center;
+        gap: 10px;
+      }
+      .timing-controls button {
+        width: 100%;
+      }
+      .timing-controls .stopwatch {
+        text-align: center;
       }
       .default-box {
         margin-top: 14px;
@@ -168,20 +182,8 @@
         font-weight: 700;
         align-self: center;
       }
-      .explanation {
-        margin-top: 16px;
-        padding: 14px;
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.04);
-        color: var(--muted);
-        font-size: 0.88rem;
-        line-height: 1.55;
-      }
-      .measurement {
-        margin-top: 16px;
-        padding-top: 16px;
-        border-top: 1px solid var(--line);
+      .center {
+        text-align: center;
       }
       @media (max-width: 650px) {
         body {
@@ -197,8 +199,7 @@
           grid-column: auto;
         }
         .type-head {
-          align-items: stretch;
-          flex-direction: column;
+          grid-template-columns: 1fr;
         }
         .meta {
           display: block;
@@ -211,7 +212,7 @@
   </head>
   <body>
     <main class="app">
-      <section class="card hero">
+      <section class="card center">
         <div class="timer" id="timer">00:00:00</div>
         <div class="scan-count" id="scanCount">0 / 0 Scan Positions</div>
         <div class="progress"><div class="bar" id="bar"></div></div>
@@ -240,8 +241,7 @@
           </div>
         </div>
         <div class="actions">
-          <button id="saveMeasurement">Save measurement settings</button
-          ><button class="secondary" id="startNow">Start now</button>
+          <button class="secondary" id="startNow">Start now</button>
         </div>
       </section>
 
@@ -256,15 +256,18 @@
           <button class="danger" id="deleteType">Delete custom type</button>
         </div>
         <div class="default-box">
-          <label>Default duration for selected scan type</label>
+          <label>Duration for selected scan type</label>
           <div class="default-value">
             <span id="defaultSeconds">100.00</span> s per scan
           </div>
         </div>
-        <div class="measurement grid">
+      </section>
+      <section class="card">
+        <div class="grid">
           <div>
-            <label for="timedScans">Number of timed scans</label
-            ><input
+            <label for="timedScans">Number of timed scans</label>
+            <label for="timedScans">.</label>
+            <input
               id="timedScans"
               type="number"
               min="1"
@@ -309,14 +312,7 @@
               </div>
             </div>
           </div>
-          <div class="full">
-            <div class="hint">
-              The measured duration is divided by the number of timed scans. The
-              resulting duration per scan replaces the default for the
-              countdown.
-            </div>
-          </div>
-          <div class="full actions">
+          <div class="full timing-controls">
             <button type="button" id="startTiming">Start Timing</button>
             <button type="button" class="secondary" id="stopTiming" disabled>
               Stop Timing
@@ -326,7 +322,7 @@
             </button>
             <span class="stopwatch" id="stopwatchStatus">00:00.000</span>
           </div>
-          <div class="full explanation">
+          <div class="full card">
             <strong>How to time your scans:</strong> You can either use the
             microscope movement and count 5–10 movements, since each movement
             has a clear sound, or count the scanning positions on the OPUS
@@ -341,7 +337,7 @@
           <button id="applyTiming">Apply measured timing</button>
           <button class="secondary" id="clearTiming">Use default</button>
           <button class="secondary" id="replaceDefault">
-            Save Scan Time as Local Default
+            Replace Default Scantime for this Scan Type
           </button>
           <button class="secondary" id="exportJson">
             Export Scan Duration Presets
@@ -503,6 +499,12 @@
           "Measurement settings saved in this browser.";
         update();
       };
+      // Save measurement settings automatically whenever either setting changes.
+      ["startTime", "totalPositions"].forEach((id) => {
+        $(id).addEventListener("input", () => $("saveMeasurement").click());
+        $(id).addEventListener("change", () => $("saveMeasurement").click());
+      });
+
       $("startNow").onclick = () => {
         $("startTime").value = localInputValue(new Date());
         $("saveMeasurement").click();
