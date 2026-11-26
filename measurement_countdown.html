@@ -14,11 +14,8 @@
         --blue: #38bdf8;
         --blue2: #0ea5e9;
         --muted: #cbd5e1;
-        --danger: #fb7185;
       }
-      * {
-        box-sizing: border-box;
-      }
+      * { box-sizing: border-box; }
       body {
         margin: 0;
         min-height: 100vh;
@@ -27,10 +24,7 @@
         font-family: "Segoe UI", Arial, sans-serif;
         color: #fff;
       }
-      .app {
-        width: min(920px, 100%);
-        margin: auto;
-      }
+      .app { width: min(920px, 100%); margin: auto; }
       .card {
         background: var(--panel);
         border: 1px solid var(--line);
@@ -70,31 +64,21 @@
         margin-top: 12px;
         color: var(--muted);
       }
-      h2 {
-        margin: 0 0 16px;
-        font-size: 1.2rem;
-      }
+      h2 { margin: 0 0 16px; font-size: 1.2rem; }
       .grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 14px;
       }
-      .full {
-        grid-column: 1/-1;
-      }
+      .full { grid-column: 1 / -1; }
       label {
         display: block;
         color: var(--muted);
         font-size: 0.88rem;
         margin-bottom: 6px;
       }
-      input,
-      select,
-      button {
-        font: inherit;
-      }
-      input,
-      select {
+      input, button { font: inherit; }
+      input {
         width: 100%;
         padding: 10px 12px;
         border: 1px solid var(--line);
@@ -111,65 +95,22 @@
         background: var(--blue2);
         color: #fff;
       }
-      button.secondary {
-        background: #334155;
-      }
-      button.danger {
-        background: #9f1239;
-      }
+      button.secondary { background: #334155; }
+      button:disabled { opacity: 0.55; cursor: not-allowed; }
       .actions {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
         gap: 10px;
         margin-top: 16px;
       }
-      .actions button {
-        width: 100%;
-        min-width: 0;
-      }
-      .type-head {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) repeat(2, minmax(150px, auto));
-        align-items: end;
-        gap: 12px;
-      }
-      .type-head > div {
-        min-width: 0;
-      }
+      .actions button { width: 100%; min-width: 0; }
       .timing-controls {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr));
         align-items: center;
         gap: 10px;
       }
-      .timing-controls button {
-        width: 100%;
-      }
-      .timing-controls .stopwatch {
-        text-align: center;
-      }
-      .default-box {
-        margin-top: 14px;
-        padding: 14px;
-        border-radius: 12px;
-        background: rgba(14, 165, 233, 0.1);
-        border: 1px solid rgba(56, 189, 248, 0.28);
-      }
-      .default-value {
-        font-size: 1.35rem;
-        color: #7dd3fc;
-        font-weight: 700;
-      }
-      .hint {
-        color: #94a3b8;
-        font-size: 0.84rem;
-        line-height: 1.5;
-      }
-      .status {
-        min-height: 1.3em;
-        margin-top: 10px;
-        color: #86efac;
-      }
+      .timing-controls button { width: 100%; }
       .duration-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -181,32 +122,22 @@
         color: #7dd3fc;
         font-weight: 700;
         align-self: center;
-      }
-      .center {
         text-align: center;
       }
+      .hint {
+        color: #cbd5e1;
+        font-size: 0.9rem;
+        line-height: 1.55;
+      }
+      .status { min-height: 1.3em; margin-top: 10px; color: #86efac; }
+      .center { text-align: center; }
       @media (max-width: 650px) {
-        body {
-          padding: 14px;
-        }
-        .card {
-          padding: 18px;
-        }
-        .grid {
-          grid-template-columns: 1fr;
-        }
-        .full {
-          grid-column: auto;
-        }
-        .type-head {
-          grid-template-columns: 1fr;
-        }
-        .meta {
-          display: block;
-        }
-        .meta div {
-          margin-top: 5px;
-        }
+        body { padding: 14px; }
+        .card { padding: 18px; }
+        .grid { grid-template-columns: 1fr; }
+        .full { grid-column: auto; }
+        .meta { display: block; }
+        .meta div { margin-top: 5px; }
       }
     </style>
   </head>
@@ -226,305 +157,269 @@
         <h2>Measurement settings</h2>
         <div class="grid">
           <div>
-            <label for="totalPositions">Total positions</label
-            ><input
-              id="totalPositions"
-              type="number"
-              min="1"
-              step="1"
-              value="2500"
-            />
+            <label for="totalPositions">Total positions</label>
+            <input id="totalPositions" type="number" min="1" step="1" value="2500" />
           </div>
           <div>
-            <label for="startTime">Start date and time</label
-            ><input id="startTime" type="datetime-local" step="1" />
+            <label for="startTime">Start date and time</label>
+            <input id="startTime" type="datetime-local" step="1" />
           </div>
         </div>
         <div class="actions">
-          <button class="secondary" id="startNow">Start now</button>
+          <button class="secondary" id="startNow" type="button">Start now</button>
         </div>
       </section>
 
       <section class="card">
-        <h2>Scan type and timing</h2>
-        <div class="type-head">
-          <div>
-            <label for="scanType">Scan type</label
-            ><select id="scanType"></select>
-          </div>
-          <button class="secondary" id="addType">Add scan type</button>
-          <button class="danger" id="deleteType">Delete custom type</button>
+        <h2>Timing per position</h2>
+        <div>
+          <label for="secondsPerPosition">Current timing per position (seconds)</label>
+          <input
+            id="secondsPerPosition"
+            type="number"
+            min="0.001"
+            step="0.001"
+            value="19.25"
+          />
         </div>
-        <div class="default-box">
-          <label>Duration for selected scan type</label>
-          <div class="default-value">
-            <span id="defaultSeconds">100.00</span> s per scan
-          </div>
+        <div class="actions">
+          <button class="secondary" id="useBaseline" type="button">Use baseline timing (19.25 s)</button>
         </div>
+        <div id="timingStatus" class="status" aria-live="polite"></div>
       </section>
+
       <section class="card">
+        <h2>Measure scan duration</h2>
         <div class="grid">
           <div>
-            <label for="timedScans">Number of timed scans</label>
-            <label for="timedScans">.</label>
-            <input
-              id="timedScans"
-              type="number"
-              min="1"
-              step="1"
-              placeholder="e.g. 20"
-            />
+            <label for="timedScans">Number of timed intervals</label>
+            <input id="timedScans" type="number" min="1" step="1" placeholder="e.g. 10" />
           </div>
           <div>
             <label>Total measured duration</label>
             <div class="duration-grid">
               <div>
-                <label for="timingMinutes">Minutes</label
-                ><input
-                  id="timingMinutes"
-                  type="number"
-                  min="0"
-                  step="1"
-                  value="0"
-                />
+                <label for="timingMinutes">Minutes</label>
+                <input id="timingMinutes" type="number" min="0" step="1" value="0" />
               </div>
               <div>
-                <label for="timingSeconds">Seconds</label
-                ><input
-                  id="timingSeconds"
-                  type="number"
-                  min="0"
-                  max="59"
-                  step="1"
-                  value="0"
-                />
+                <label for="timingSeconds">Seconds</label>
+                <input id="timingSeconds" type="number" min="0" max="59" step="1" value="0" />
               </div>
               <div>
-                <label for="timingMilliseconds">Milliseconds</label
-                ><input
-                  id="timingMilliseconds"
-                  type="number"
-                  min="0"
-                  max="999"
-                  step="1"
-                  value="0"
-                />
+                <label for="timingMilliseconds">Milliseconds</label>
+                <input id="timingMilliseconds" type="number" min="0" max="999" step="1" value="0" />
               </div>
             </div>
           </div>
           <div class="full timing-controls">
             <button type="button" id="startTiming">Start Timing</button>
-            <button type="button" class="secondary" id="stopTiming" disabled>
-              Stop Timing
-            </button>
-            <button type="button" class="secondary" id="resetTiming">
-              Reset Timer
-            </button>
+            <button type="button" class="secondary" id="stopTiming" disabled>Stop Timing</button>
+            <button type="button" class="secondary" id="resetTiming">Reset Timer</button>
             <span class="stopwatch" id="stopwatchStatus">00:00.000</span>
           </div>
-          <div class="full card">
-            <strong>How to time your scans:</strong> You can either use the
-            microscope movement and count 5–10 movements, since each movement
-            has a clear sound, or count the scanning positions on the OPUS
-            display. Press <strong>Start Timing</strong> when the first scanning
-            position has finished, then press <strong>Stop Timing</strong> when
-            the chosen later position has finished. Timing at least 5 positions
-            is recommended. This stopwatch runs separately from the
-            <strong>Start now</strong> button above.
+          <div class="full hint">
+            <strong>How to time your scans:</strong> You can either use the microscope movement and count 5–10 movements, since each movement has a clear sound, or count the scanning positions on the OPUS display. Press <strong>Start Timing</strong> when the first scanning position has finished, then press <strong>Stop Timing</strong> when the chosen later position has finished. Enter the number of intervals measured. Timing at least 5 intervals is recommended. This stopwatch runs separately from the <strong>Start now</strong> button above.
           </div>
         </div>
         <div class="actions">
-          <button id="applyTiming">Apply measured timing</button>
-          <button class="secondary" id="clearTiming">Use default</button>
-          <button class="secondary" id="replaceDefault">
-            Replace Default Scantime for this Scan Type
-          </button>
-          <button class="secondary" id="exportJson">
-            Export Scan Duration Presets
-          </button>
-          <button class="danger" id="resetPresets">
-            Reload Presets from Server
-          </button>
+          <button id="applyTiming" type="button">Apply measured timing</button>
+          <button class="secondary" id="clearTiming" type="button">Clear measured duration</button>
         </div>
-        <div id="calculated" class="status"></div>
+        <div id="calculated" class="status" aria-live="polite"></div>
       </section>
     </main>
+
     <script>
-      const BUILT_IN_TYPES = [
-        { name: "Could not load Server Presets", defaultSeconds: 19.25 },
-      ];
+      const STORAGE_KEY = "measurementSettings";
+      const BASELINE_SECONDS_PER_POSITION = 19.25;
       const $ = (id) => document.getElementById(id);
-      let types = load("scanTypes", BUILT_IN_TYPES);
-      let settings = load("measurementSettings", {});
-      let activeSeconds = 19.25;
-      let intervalId;
+
+      let settings = loadSettings();
+      let activeSeconds = settings.secondsPerPosition;
+      let timerInterval = null;
       let stopwatchInterval = null;
       let stopwatchStartedAt = 0;
       let stopwatchElapsed = 0;
 
-      function load(key, fallback) {
+      function readJson(key, fallback) {
         try {
-          return JSON.parse(localStorage.getItem(key)) ?? fallback;
+          const raw = localStorage.getItem(key);
+          return raw === null ? fallback : JSON.parse(raw);
         } catch {
           return fallback;
         }
       }
-      function save(key, value) {
-        localStorage.setItem(key, JSON.stringify(value));
+
+      // One-time migration: retain the previously active per-position timing,
+      // then remove the obsolete scan-type storage keys.
+      function getLegacyTiming() {
+        const savedTypes = readJson("scanTypes", []);
+        const selectedName = readJson("selectedScanType", null);
+        const overrides = readJson("timingOverrides", {});
+        const selectedType = Array.isArray(savedTypes)
+          ? savedTypes.find((type) => type.name === selectedName) || savedTypes[0]
+          : null;
+        const overrideSeconds = selectedType && Number(overrides?.[selectedType.name]?.seconds);
+        const typeSeconds = selectedType && Number(selectedType.defaultSeconds);
+        if (Number.isFinite(overrideSeconds) && overrideSeconds > 0) return overrideSeconds;
+        if (Number.isFinite(typeSeconds) && typeSeconds > 0) return typeSeconds;
+        return BASELINE_SECONDS_PER_POSITION;
       }
-      async function loadServerPresets() {
-        const response = await fetch("scan-types.json", { cache: "no-store" });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        if (!Array.isArray(data.scanTypes) || !data.scanTypes.length)
-          throw new Error("Invalid preset file");
-        return data.scanTypes
-          .map((t) => ({
-            name: String(t.name),
-            defaultSeconds: Number(t.defaultSeconds),
-          }))
-          .filter((t) => t.name && t.defaultSeconds > 0);
-      }
-      async function initializePresets() {
-        if (load("scanTypes")) return;
+
+      function loadSettings() {
+        const stored = readJson(STORAGE_KEY, {});
+        const legacyTiming = getLegacyTiming();
+        const seconds = Number(stored.secondsPerPosition);
+        const next = {
+          totalPositions: Math.max(1, parseInt(stored.totalPositions, 10) || 2500),
+          startTime: typeof stored.startTime === "string" ? stored.startTime : "",
+          secondsPerPosition: Number.isFinite(seconds) && seconds > 0 ? seconds : legacyTiming,
+        };
+
+        // Keep only the three requested values in the single settings entry.
         try {
-          types = await loadServerPresets();
-          save("scanTypes", types);
-        } catch {
-          types = BUILT_IN_TYPES;
-          save("scanTypes", types);
+          localStorage.removeItem("scanTypes");
+          localStorage.removeItem("selectedScanType");
+          localStorage.removeItem("timingOverrides");
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        } catch (error) {
+          console.warn("Settings could not be saved in localStorage:", error);
+        }
+        return next;
+      }
+
+      function saveSettings() {
+        settings = {
+          totalPositions: Math.max(1, parseInt($("totalPositions").value, 10) || 1),
+          startTime: $("startTime").value,
+          secondsPerPosition: activeSeconds,
+        };
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+        } catch (error) {
+          console.warn("Settings could not be saved in localStorage:", error);
         }
       }
-      function localInputValue(d) {
-        const p = (n) => String(n).padStart(2, "0");
-        return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+
+      function localInputValue(date) {
+        const p = (number) => String(number).padStart(2, "0");
+        return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}T${p(date.getHours())}:${p(date.getMinutes())}:${p(date.getSeconds())}`;
       }
+
       function parseStart() {
-        const d = new Date($("startTime").value);
-        return isNaN(d) ? new Date() : d;
+        const date = new Date($("startTime").value);
+        return Number.isNaN(date.getTime()) ? new Date() : date;
       }
+
       function getTimingDuration() {
         return (
-          Math.max(0, parseInt($("timingMinutes").value) || 0) * 60 +
-          Math.max(0, parseInt($("timingSeconds").value) || 0) +
-          Math.max(0, parseInt($("timingMilliseconds").value) || 0) / 1000
+          Math.max(0, parseInt($("timingMinutes").value, 10) || 0) * 60 +
+          Math.max(0, parseInt($("timingSeconds").value, 10) || 0) +
+          Math.max(0, parseInt($("timingMilliseconds").value, 10) || 0) / 1000
         );
       }
-      function setTimingDuration(total) {
-        total = Math.max(0, Number(total) || 0);
+
+      function setTimingDuration(totalSeconds) {
+        const total = Math.max(0, Number(totalSeconds) || 0);
         $("timingMinutes").value = Math.floor(total / 60);
         $("timingSeconds").value = Math.floor(total % 60);
-        $("timingMilliseconds").value = Math.round(
-          (total - Math.floor(total)) * 1000,
-        )
+        $("timingMilliseconds").value = Math.round((total - Math.floor(total)) * 1000)
           .toString()
           .padStart(3, "0");
       }
-      function renderStopwatch(ms) {
-        const min = Math.floor(ms / 60000),
-          sec = Math.floor((ms % 60000) / 1000),
-          milli = Math.floor(ms % 1000);
+
+      function renderStopwatch(milliseconds) {
+        const minutes = Math.floor(milliseconds / 60000);
+        const seconds = Math.floor((milliseconds % 60000) / 1000);
+        const millis = Math.floor(milliseconds % 1000);
         $("stopwatchStatus").textContent =
-          `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}.${String(milli).padStart(3, "0")}`;
-        setTimingDuration(ms / 1000);
+          `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(millis).padStart(3, "0")}`;
+        setTimingDuration(milliseconds / 1000);
       }
-      function currentType() {
-        return types.find((t) => t.name === $("scanType").value) || types[0];
-      }
-      function renderTypes(selectName) {
-        $("scanType").innerHTML = "";
-        types.forEach((t) => {
-          const o = document.createElement("option");
-          o.value = t.name;
-          o.textContent = t.name;
-          $("scanType").appendChild(o);
-        });
-        $("scanType").value = types.some((t) => t.name === selectName)
-          ? selectName
-          : types[0].name;
-        showType();
-      }
-      function showType() {
-        const t = currentType();
-        $("defaultSeconds").textContent = Number(t.defaultSeconds)
-          .toFixed(3)
-          .replace(/0+$/, "")
-          .replace(/\.$/, "");
-        const perType = load("timingOverrides", {});
-        const ov = perType[t.name];
-        activeSeconds = ov?.seconds || Number(t.defaultSeconds);
-        $("timedScans").value = ov?.timedScans || "";
-        setTimingDuration(ov?.timingDuration || 0);
-        $("calculated").textContent = ov
-          ? `Measured timing in use: ${activeSeconds.toFixed(4)} s per scan.`
-          : `Default timing in use: ${activeSeconds.toFixed(4)} s per scan.`;
-        save("selectedScanType", t.name);
-        update();
-      }
+
       function update() {
-        const total = Math.max(1, parseInt($("totalPositions").value) || 1);
+        const total = Math.max(1, parseInt($("totalPositions").value, 10) || 1);
         const start = parseStart();
         const duration = total * activeSeconds * 1000;
         const end = new Date(start.getTime() + duration);
-        const elapsed = Math.max(
-          0,
-          Math.min(Date.now() - start.getTime(), duration),
-        );
-        const progress = duration ? elapsed / duration : 0;
+        const elapsed = Math.max(0, Math.min(Date.now() - start.getTime(), duration));
+        const progress = duration > 0 ? elapsed / duration : 0;
         const remaining = Math.max(0, duration - elapsed);
-        const h = Math.floor(remaining / 3600000),
-          m = Math.floor((remaining % 3600000) / 60000),
-          s = Math.floor((remaining % 60000) / 1000);
-        $("timer").textContent = [h, m, s]
-          .map((v) => String(v).padStart(2, "0"))
+        const hours = Math.floor(remaining / 3600000);
+        const minutes = Math.floor((remaining % 3600000) / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
+        $("timer").textContent = [hours, minutes, seconds]
+          .map((value) => String(value).padStart(2, "0"))
           .join(":");
-        const current =
-          Date.now() < start.getTime()
-            ? 0
-            : Math.min(total, Math.floor(elapsed / (activeSeconds * 1000)) + 1);
-        $("scanCount").textContent =
-          `${remaining <= 0 ? total : current} / ${total} Scan Positions`;
+
+        const current = Date.now() < start.getTime()
+          ? 0
+          : Math.min(total, Math.floor(elapsed / (activeSeconds * 1000)) + 1);
+        $("scanCount").textContent = `${remaining <= 0 ? total : current} / ${total} Scan Positions`;
         $("bar").style.width = `${progress * 100}%`;
         $("percent").textContent = `${(progress * 100).toFixed(1)}% complete`;
-        $("finishTime").textContent =
-          `Expected finish: ${end.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "medium" })}`;
+        $("finishTime").textContent = `Expected finish: ${end.toLocaleString(undefined, {
+          dateStyle: "medium",
+          timeStyle: "medium",
+        })}`;
       }
-      updateSettings = () => {
-        settings = {
-          totalPositions: Math.max(1, parseInt($("totalPositions").value) || 1),
-          startTime: $("startTime").value,
-        };
-        save("measurementSettings", settings);
-        $("calculated").textContent =
-          "Measurement settings saved in this browser.";
+
+      function applyCurrentTiming(value, message) {
+        const seconds = Number(value);
+        if (!Number.isFinite(seconds) || seconds <= 0) {
+          $("timingStatus").textContent = "Please enter a timing greater than zero.";
+          return false;
+        }
+        activeSeconds = seconds;
+        $("secondsPerPosition").value = String(seconds);
+        saveSettings();
         update();
-      };
-      // Save measurement settings automatically whenever either setting changes.
+        $("timingStatus").textContent = message || `Current timing saved: ${activeSeconds.toFixed(4)} s per position.`;
+        return true;
+      }
+
       ["startTime", "totalPositions"].forEach((id) => {
-        $(id).addEventListener("input", () => updateSettings());
-        $(id).addEventListener("change", () => updateSettings());
+        $(id).addEventListener("input", () => {
+          saveSettings();
+          update();
+        });
+        $(id).addEventListener("change", () => {
+          saveSettings();
+          update();
+        });
+      });
+
+      $("secondsPerPosition").addEventListener("change", () => {
+        applyCurrentTiming($("secondsPerPosition").value);
       });
 
       $("startNow").onclick = () => {
         $("startTime").value = localInputValue(new Date());
+        saveSettings();
+        update();
       };
-      $("scanType").onchange = showType;
+
+      $("useBaseline").onclick = () => {
+        applyCurrentTiming(
+          BASELINE_SECONDS_PER_POSITION,
+          `Baseline timing applied: ${BASELINE_SECONDS_PER_POSITION.toFixed(2)} s per position.`,
+        );
+      };
+
       $("startTiming").onclick = () => {
         stopwatchElapsed = 0;
         stopwatchStartedAt = performance.now();
         $("startTiming").disabled = true;
         $("stopTiming").disabled = false;
         clearInterval(stopwatchInterval);
-        stopwatchInterval = setInterval(
-          () =>
-            renderStopwatch(
-              stopwatchElapsed + performance.now() - stopwatchStartedAt,
-            ),
-          25,
-        );
+        stopwatchInterval = setInterval(() => {
+          renderStopwatch(stopwatchElapsed + performance.now() - stopwatchStartedAt);
+        }, 25);
       };
+
       $("stopTiming").onclick = () => {
-        if (!stopwatchInterval) return;
+        if (stopwatchInterval === null) return;
         stopwatchElapsed += performance.now() - stopwatchStartedAt;
         clearInterval(stopwatchInterval);
         stopwatchInterval = null;
@@ -532,6 +427,7 @@
         $("startTiming").disabled = false;
         $("stopTiming").disabled = true;
       };
+
       $("resetTiming").onclick = () => {
         clearInterval(stopwatchInterval);
         stopwatchInterval = null;
@@ -542,137 +438,34 @@
       };
 
       $("applyTiming").onclick = () => {
-        const n = parseInt($("timedScans").value),
-          duration = getTimingDuration();
-        if (!(n > 0 && duration > 0)) {
-          alert(
-            "Please enter a valid number of timed scans and total timing duration.",
-          );
+        const scanIntervals = parseInt($("timedScans").value, 10);
+        const duration = getTimingDuration();
+        if (!(scanIntervals > 0 && duration > 0)) {
+          alert("Please enter a valid number of timed intervals and a total timing duration.");
           return;
         }
-        activeSeconds = duration / n;
-        const all = load("timingOverrides", {});
-        all[currentType().name] = {
-          timedScans: n,
-          timingDuration: duration,
-          seconds: activeSeconds,
-        };
-        save("timingOverrides", all);
-        $("calculated").textContent =
-          `Measured timing applied: ${duration} s ÷ ${n} scans = ${activeSeconds.toFixed(4)} s per scan.`;
-        update();
-      };
-      $("clearTiming").onclick = () => {
-        const all = load("timingOverrides", {});
-        delete all[currentType().name];
-        save("timingOverrides", all);
-        $("timedScans").value = "";
-        setTimingDuration(0);
-        showType();
-      };
-      $("replaceDefault").onclick = () => {
-        const n = parseInt($("timedScans").value),
-          duration = getTimingDuration();
-        if (!(n > 0 && duration > 0)) {
-          alert("Enter timed scans and total timing duration first.");
-          return;
-        }
-        const value = duration / n;
-        if (
-          !confirm(
-            `Replace the default for ${currentType().name} with ${value.toFixed(4)} seconds per scan?`,
-          )
-        )
-          return;
-        currentType().defaultSeconds = value;
-        save("scanTypes", types);
-        const all = load("timingOverrides", {});
-        delete all[currentType().name];
-        save("timingOverrides", all);
-        showType();
-        alert(
-          "This scan time is now saved as the local default in this browser. It does not modify scan-types.json. Use Export Scan Duration Presets to download a portable copy.",
+        const secondsPerPosition = duration / scanIntervals;
+        applyCurrentTiming(
+          secondsPerPosition,
+          `${duration} s ÷ ${scanIntervals} intervals = ${secondsPerPosition.toFixed(4)} s per position. Saved.`,
         );
       };
-      $("addType").onclick = () => {
-        const name = prompt("Name of the new scan type:");
-        if (!name?.trim()) return;
-        if (
-          types.some((t) => t.name.toLowerCase() === name.trim().toLowerCase())
-        ) {
-          alert("This scan type already exists.");
-          return;
-        }
-        const raw = prompt(
-            "Default duration in seconds. The new scan type will be stored locally in this browser:",
-            "19.25",
-          ),
-          seconds = parseFloat(raw);
-        if (!(seconds > 0)) {
-          alert("Invalid duration.");
-          return;
-        }
-        types.push({ name: name.trim(), defaultSeconds: seconds });
-        save("scanTypes", types);
-        renderTypes(name.trim());
+
+      $("clearTiming").onclick = () => {
+        $("timedScans").value = "";
+        setTimingDuration(0);
+        $("calculated").textContent = "Measured duration cleared. The current timing per position was not changed.";
       };
-      $("deleteType").onclick = () => {
-        const t = currentType();
-        if (BUILT_IN_TYPES.some((x) => x.name === t.name)) {
-          alert(
-            "Built-in scan types cannot be deleted. Their default values can still be replaced.",
-          );
-          return;
-        }
-        if (confirm(`Delete ${t.name}?`)) {
-          types = types.filter((x) => x.name !== t.name);
-          save("scanTypes", types);
-          renderTypes(types[0].name);
-        }
-      };
-      $("resetPresets").onclick = async () => {
-        if (
-          !confirm(
-            "Reset all locally saved scan types, local default durations, and measured timing overrides, then reload scan-types.json? This cannot be undone unless you exported a backup.",
-          )
-        )
-          return;
-        try {
-          const fresh = await loadServerPresets();
-          types = fresh;
-          localStorage.removeItem("timingOverrides");
-          save("scanTypes", types);
-          save("selectedScanType", types[0].name);
-          renderTypes(types[0].name);
-          alert("Presets were reset and reloaded from scan-types.json.");
-        } catch (error) {
-          alert(
-            "scan-types.json could not be loaded. If you opened this page directly as a file, your browser may block access to the JSON file. Open the folder through a local web server and try again. No local presets were changed.",
-          );
-        }
-      };
-      $("exportJson").onclick = () => {
-        const blob = new Blob([JSON.stringify({ scanTypes: types }, null, 2)], {
-          type: "application/json",
-        });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "scan-types.json";
-        a.click();
-        URL.revokeObjectURL(a.href);
-      };
-      async function initialize() {
-        await initializePresets();
-        settings = load("measurementSettings", {});
-        if (settings.totalPositions)
-          $("totalPositions").value = settings.totalPositions;
-        $("startTime").value =
-          settings.startTime || localInputValue(new Date());
-        renderTypes(load("selectedScanType") || "No ScanTypes Exist");
-        clearInterval(intervalId);
-        intervalId = setInterval(update, 1000);
+
+      function initialize() {
+        $("totalPositions").value = settings.totalPositions;
+        $("startTime").value = settings.startTime || localInputValue(new Date());
+        $("secondsPerPosition").value = String(activeSeconds);
+        saveSettings();
         update();
+        timerInterval = setInterval(update, 1000);
       }
+
       initialize();
     </script>
   </body>
