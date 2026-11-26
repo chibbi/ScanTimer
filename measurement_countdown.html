@@ -1,472 +1,533 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Measurement Countdown</title>
-    <style>
-      :root {
-        color-scheme: dark;
-        --bg1: #111827;
-        --bg2: #243047;
-        --panel: rgba(255, 255, 255, 0.075);
-        --line: rgba(255, 255, 255, 0.14);
-        --blue: #38bdf8;
-        --blue2: #0ea5e9;
-        --muted: #cbd5e1;
-      }
-      * { box-sizing: border-box; }
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Measurement Countdown</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg1: #111827;
+      --bg2: #243047;
+      --panel: rgba(255, 255, 255, 0.075);
+      --line: rgba(255, 255, 255, 0.14);
+      --blue: #38bdf8;
+      --blue2: #0ea5e9;
+      --muted: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 28px;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #fff;
+    }
+
+    .app {
+      width: min(920px, 100%);
+      margin: auto;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(12px);
+      margin-bottom: 18px;
+    }
+
+    .timer {
+      font-size: clamp(3rem, 9vw, 5.5rem);
+      font-weight: 700;
+      letter-spacing: 3px;
+    }
+
+    .scan-count {
+      font-size: clamp(1.5rem, 4vw, 2.3rem);
+      color: #7dd3fc;
+      margin: 10px 0 18px;
+    }
+
+    .progress {
+      height: 14px;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--blue), var(--blue2));
+      transition: width 0.6s linear;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      color: var(--muted);
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 1.2rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .measurement-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) 50%;
+      gap: 14px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-bottom: 6px;
+    }
+
+    input,
+    button {
+      font: inherit;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #162033;
+      color: #fff;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-weight: 650;
+      background: var(--blue2);
+      color: #fff;
+    }
+
+    button.secondary {
+      background: #334155;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .actions button {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .timing-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr));
+      align-items: center;
+      gap: 10px;
+    }
+
+    .timing-controls button {
+      width: 100%;
+    }
+
+    .duration-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stopwatch {
+      font-variant-numeric: tabular-nums;
+      font-size: 1.15rem;
+      color: #7dd3fc;
+      font-weight: 700;
+      align-self: center;
+      text-align: center;
+    }
+
+    .hint {
+      color: #cbd5e1;
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .status {
+      min-height: 1.3em;
+      margin-top: 10px;
+      color: #86efac;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .done .timer,
+    .done .scan-count {
+      color: #86efac;
+    }
+
+    .done .bar {
+      background: linear-gradient(90deg, #22c55e, #86efac);
+    }
+
+    @media (max-width: 650px) {
       body {
-        margin: 0;
-        min-height: 100vh;
-        padding: 28px;
-        background: linear-gradient(135deg, var(--bg1), var(--bg2));
-        font-family: "Segoe UI", Arial, sans-serif;
-        color: #fff;
+        padding: 14px;
       }
-      .app { width: min(920px, 100%); margin: auto; }
+
       .card {
-        background: var(--panel);
-        border: 1px solid var(--line);
-        border-radius: 20px;
-        padding: 24px;
-        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
-        backdrop-filter: blur(12px);
-        margin-bottom: 18px;
+        padding: 18px;
       }
-      .timer {
-        font-size: clamp(3rem, 9vw, 5.5rem);
-        font-weight: 700;
-        letter-spacing: 3px;
-      }
-      .scan-count {
-        font-size: clamp(1.5rem, 4vw, 2.3rem);
-        color: #7dd3fc;
-        margin: 10px 0 18px;
-      }
-      .progress {
-        height: 14px;
-        background: rgba(255, 255, 255, 0.14);
-        border-radius: 999px;
-        overflow: hidden;
-      }
-      .bar {
-        height: 100%;
-        width: 0;
-        background: linear-gradient(90deg, var(--blue), var(--blue2));
-        transition: width 0.6s linear;
-      }
-      .meta {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-top: 12px;
-        color: var(--muted);
-      }
-      h2 { margin: 0 0 16px; font-size: 1.2rem; }
+
       .grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
+        grid-template-columns: 1fr;
       }
-      .full { grid-column: 1 / -1; }
-      label {
+
+      .full {
+        grid-column: auto;
+      }
+
+      .meta {
         display: block;
-        color: var(--muted);
-        font-size: 0.88rem;
-        margin-bottom: 6px;
       }
-      input, button { font: inherit; }
-      input {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        background: #162033;
-        color: #fff;
-      }
-      button {
-        border: 0;
-        border-radius: 10px;
-        padding: 10px 15px;
-        cursor: pointer;
-        font-weight: 650;
-        background: var(--blue2);
-        color: #fff;
-      }
-      button.secondary { background: #334155; }
-      button:disabled { opacity: 0.55; cursor: not-allowed; }
-      .actions {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
-        gap: 10px;
-        margin-top: 16px;
-      }
-      .actions button { width: 100%; min-width: 0; }
-      .timing-controls {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr));
-        align-items: center;
-        gap: 10px;
-      }
-      .timing-controls button { width: 100%; }
-      .duration-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 10px;
-      }
-      .stopwatch {
-        font-variant-numeric: tabular-nums;
-        font-size: 1.15rem;
-        color: #7dd3fc;
-        font-weight: 700;
-        align-self: center;
-        text-align: center;
-      }
-      .hint {
-        color: #cbd5e1;
-        font-size: 0.9rem;
-        line-height: 1.55;
-      }
-      .status { min-height: 1.3em; margin-top: 10px; color: #86efac; }
-      .center { text-align: center; }
-      @media (max-width: 650px) {
-        body { padding: 14px; }
-        .card { padding: 18px; }
-        .grid { grid-template-columns: 1fr; }
-        .full { grid-column: auto; }
-        .meta { display: block; }
-        .meta div { margin-top: 5px; }
-      }
-    </style>
-  </head>
-  <body>
-    <main class="app">
-      <section class="card center">
-        <div class="timer" id="timer">00:00:00</div>
-        <div class="scan-count" id="scanCount">0 / 0 Scan Positions</div>
-        <div class="progress"><div class="bar" id="bar"></div></div>
-        <div class="meta">
-          <div id="percent">0.0% complete</div>
-          <div id="finishTime">Expected finish: --</div>
-        </div>
-      </section>
 
-      <section class="card">
-        <h2>Measurement settings</h2>
-        <div class="grid">
-          <div>
-            <label for="totalPositions">Total positions</label>
-            <input id="totalPositions" type="number" min="1" step="1" value="2500" />
-          </div>
-          <div>
-            <label for="startTime">Start date and time</label>
-            <input id="startTime" type="datetime-local" step="1" />
-          </div>
-        </div>
-        <div class="actions">
-          <button class="secondary" id="startNow" type="button">Start now</button>
-        </div>
-      </section>
+      .meta div {
+        margin-top: 5px;
+      }
+    }
+  </style>
+</head>
 
-      <section class="card">
-        <h2>Timing per position</h2>
+<body>
+  <main class="app">
+    <section id="container" class="card center">
+      <div class="timer" id="timer">00:00:00</div>
+      <div class="scan-count" id="scanCount">0 / 0 Scan Positions</div>
+      <div class="progress">
+        <div class="bar" id="bar"></div>
+      </div>
+      <div class="meta">
+        <div id="percent">0.0% complete</div>
+        <div id="finishTime">Expected finish: --</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Measurement settings</h2>
+      <div class="measurement-grid">
         <div>
-          <label for="secondsPerPosition">Current timing per position (seconds)</label>
-          <input
-            id="secondsPerPosition"
-            type="number"
-            min="0.001"
-            step="0.001"
-            value="19.25"
-          />
+          <label for="totalPositions">Total positions</label>
+          <input id="totalPositions" type="number" min="1" step="1" placeholder="e.g. 2500" />
         </div>
-        <div class="actions">
-          <button class="secondary" id="useBaseline" type="button">Use baseline timing (19.25 s)</button>
+        <div>
+          <label for="secondsPerPosition">Time per position</label>
+          <input id="secondsPerPosition" type="number" min="0.001" step="0.001" placeholder="e.g. 3.25" />
         </div>
-        <div id="timingStatus" class="status" aria-live="polite"></div>
-      </section>
-
-      <section class="card">
-        <h2>Measure scan duration</h2>
-        <div class="grid">
-          <div>
-            <label for="timedScans">Number of timed intervals</label>
-            <input id="timedScans" type="number" min="1" step="1" placeholder="e.g. 10" />
-          </div>
-          <div>
-            <label>Total measured duration</label>
-            <div class="duration-grid">
-              <div>
-                <label for="timingMinutes">Minutes</label>
-                <input id="timingMinutes" type="number" min="0" step="1" value="0" />
-              </div>
-              <div>
-                <label for="timingSeconds">Seconds</label>
-                <input id="timingSeconds" type="number" min="0" max="59" step="1" value="0" />
-              </div>
-              <div>
-                <label for="timingMilliseconds">Milliseconds</label>
-                <input id="timingMilliseconds" type="number" min="0" max="999" step="1" value="0" />
-              </div>
+        <div>
+          <label for="startTime">Start date and time</label>
+          <input id="startTime" type="datetime-local" step="1" />
+        </div>
+      </div>
+      <div class="actions">
+        <button class="secondary" id="startNow" type="button">Start now</button>
+      </div>
+    </section>
+    <section class="card">
+      <h2>Measure Position duration</h2>
+      <div class="grid">
+        <div>
+          <label for="timedScans">Number of (timed) positions</label>
+          <label for="timedScans">&ensp;</label>
+          <input id="timedScans" type="number" min="1" step="1" placeholder="e.g. 10" />
+        </div>
+        <div>
+          <label>Total measured time</label>
+          <div class="duration-grid">
+            <div>
+              <label for="timingMinutes">Minutes</label>
+              <input id="timingMinutes" type="number" min="0" step="1" placeholder="0" />
+            </div>
+            <div>
+              <label for="timingSeconds">Seconds</label>
+              <input id="timingSeconds" type="number" min="0" max="59" step="1" placeholder="0" />
+            </div>
+            <div>
+              <label for="timingMilliseconds">Milliseconds</label>
+              <input id="timingMilliseconds" type="number" min="0" max="999" step="1" placeholder="0" />
             </div>
           </div>
-          <div class="full timing-controls">
-            <button type="button" id="startTiming">Start Timing</button>
-            <button type="button" class="secondary" id="stopTiming" disabled>Stop Timing</button>
-            <button type="button" class="secondary" id="resetTiming">Reset Timer</button>
-            <span class="stopwatch" id="stopwatchStatus">00:00.000</span>
-          </div>
-          <div class="full hint">
-            <strong>How to time your scans:</strong> You can either use the microscope movement and count 5–10 movements, since each movement has a clear sound, or count the scanning positions on the OPUS display. Press <strong>Start Timing</strong> when the first scanning position has finished, then press <strong>Stop Timing</strong> when the chosen later position has finished. Enter the number of intervals measured. Timing at least 5 intervals is recommended. This stopwatch runs separately from the <strong>Start now</strong> button above.
-          </div>
         </div>
-        <div class="actions">
-          <button id="applyTiming" type="button">Apply measured timing</button>
-          <button class="secondary" id="clearTiming" type="button">Clear measured duration</button>
+        <div class="full timing-controls">
+          <button type="button" id="startTiming">Start Timing</button>
+          <button type="button" class="secondary" id="stopTiming" disabled>Stop Timing</button>
+          <button type="button" class="secondary" id="resetTiming">Reset Timer</button>
+          <span class="stopwatch" id="stopwatchStatus">00:00.000</span>
         </div>
-        <div id="calculated" class="status" aria-live="polite"></div>
-      </section>
-    </main>
+        <div class="full hint">
+          <strong>How to time your scans:</strong> You can either count the microscope movements,
+          since each movement has a clear sound, or count the scanning positions on the display.
+          <br>
+          For Example: Press <strong>Start Timing</strong> when the first scanning position has finished, then press
+          <strong>Stop Timing</strong> when the chosen later position has finished. Enter the number of intervals
+          measured. Timing at least 5 intervals is recommended.
+        </div>
+      </div>
+      <div class="actions">
+        <button id="applyTiming" type="button">Apply measured timing</button>
+        <button class="secondary" id="clearTiming" type="button">Clear measured duration</button>
+      </div>
+      <div id="calculated" class="status" aria-live="polite"></div>
+    </section>
+  </main>
 
-    <script>
-      const STORAGE_KEY = "measurementSettings";
-      const BASELINE_SECONDS_PER_POSITION = 19.25;
-      const $ = (id) => document.getElementById(id);
+  <script>
+    const STORAGE_KEY = "measurementSettings";
+    const $ = (id) => document.getElementById(id);
 
-      let settings = loadSettings();
-      let activeSeconds = settings.secondsPerPosition;
-      let timerInterval = null;
-      let stopwatchInterval = null;
-      let stopwatchStartedAt = 0;
-      let stopwatchElapsed = 0;
+    let settings = loadSettings();
+    let activeSeconds = settings.secondsPerPosition;
+    let timerInterval = null;
+    let stopwatchInterval = null;
+    let stopwatchStartedAt = 0;
+    let stopwatchElapsed = 0;
 
-      function readJson(key, fallback) {
-        try {
-          const raw = localStorage.getItem(key);
-          return raw === null ? fallback : JSON.parse(raw);
-        } catch {
-          return fallback;
-        }
+    function readJson(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw === null ? fallback : JSON.parse(raw);
+      } catch {
+        return fallback;
       }
+    }
 
-      // One-time migration: retain the previously active per-position timing,
-      // then remove the obsolete scan-type storage keys.
-      function getLegacyTiming() {
-        const savedTypes = readJson("scanTypes", []);
-        const selectedName = readJson("selectedScanType", null);
-        const overrides = readJson("timingOverrides", {});
-        const selectedType = Array.isArray(savedTypes)
-          ? savedTypes.find((type) => type.name === selectedName) || savedTypes[0]
-          : null;
-        const overrideSeconds = selectedType && Number(overrides?.[selectedType.name]?.seconds);
-        const typeSeconds = selectedType && Number(selectedType.defaultSeconds);
-        if (Number.isFinite(overrideSeconds) && overrideSeconds > 0) return overrideSeconds;
-        if (Number.isFinite(typeSeconds) && typeSeconds > 0) return typeSeconds;
-        return BASELINE_SECONDS_PER_POSITION;
+    function loadSettings() {
+      const stored = readJson(STORAGE_KEY, {});
+      const seconds = Number(stored.secondsPerPosition);
+      const next = {
+        totalPositions: Math.max(1, parseInt(stored.totalPositions, 10)),
+        startTime: typeof stored.startTime === "string" ? stored.startTime : "",
+        secondsPerPosition: Number.isFinite(seconds),
+      };
+
+      // Keep only the three requested values in the single settings entry.
+      try {
+        localStorage.removeItem("scanTypes");
+        localStorage.removeItem("selectedScanType");
+        localStorage.removeItem("timingOverrides");
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      } catch (error) {
+        console.warn("Settings could not be saved in localStorage:", error);
       }
+      return next;
+    }
 
-      function loadSettings() {
-        const stored = readJson(STORAGE_KEY, {});
-        const legacyTiming = getLegacyTiming();
-        const seconds = Number(stored.secondsPerPosition);
-        const next = {
-          totalPositions: Math.max(1, parseInt(stored.totalPositions, 10) || 2500),
-          startTime: typeof stored.startTime === "string" ? stored.startTime : "",
-          secondsPerPosition: Number.isFinite(seconds) && seconds > 0 ? seconds : legacyTiming,
-        };
-
-        // Keep only the three requested values in the single settings entry.
-        try {
-          localStorage.removeItem("scanTypes");
-          localStorage.removeItem("selectedScanType");
-          localStorage.removeItem("timingOverrides");
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-        } catch (error) {
-          console.warn("Settings could not be saved in localStorage:", error);
-        }
-        return next;
+    function saveSettings() {
+      settings = {
+        totalPositions: Math.max(1, parseInt($("totalPositions").value, 10) || 1),
+        startTime: $("startTime").value,
+        secondsPerPosition: activeSeconds,
+      };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+      } catch (error) {
+        console.warn("Settings could not be saved in localStorage:", error);
       }
+    }
 
-      function saveSettings() {
-        settings = {
-          totalPositions: Math.max(1, parseInt($("totalPositions").value, 10) || 1),
-          startTime: $("startTime").value,
-          secondsPerPosition: activeSeconds,
-        };
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-        } catch (error) {
-          console.warn("Settings could not be saved in localStorage:", error);
-        }
+    function localInputValue(date) {
+      const p = (number) => String(number).padStart(2, "0");
+      return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}T${p(date.getHours())}:${p(date.getMinutes())}:${p(date.getSeconds())}`;
+    }
+
+    function parseStart() {
+      const date = new Date($("startTime").value);
+      return Number.isNaN(date.getTime()) ? new Date() : date;
+    }
+
+    function getTimingDuration() {
+      return (
+        Math.max(0, parseInt($("timingMinutes").value, 10) || 0) * 60 +
+        Math.max(0, parseInt($("timingSeconds").value, 10) || 0) +
+        Math.max(0, parseInt($("timingMilliseconds").value, 10) || 0) / 1000
+      );
+    }
+
+    function setTimingDuration(totalSeconds) {
+      const total = Math.max(0, Number(totalSeconds) || 0);
+      $("timingMinutes").value = Math.floor(total / 60);
+      $("timingSeconds").value = Math.floor(total % 60);
+      $("timingMilliseconds").value = Math.round((total - Math.floor(total)) * 1000)
+        .toString()
+        .padStart(3, "0");
+    }
+
+    function renderStopwatch(milliseconds) {
+      const minutes = Math.floor(milliseconds / 60000);
+      const seconds = Math.floor((milliseconds % 60000) / 1000);
+      const millis = Math.floor(milliseconds % 1000);
+      $("stopwatchStatus").textContent =
+        `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(millis).padStart(3, "0")}`;
+      setTimingDuration(milliseconds / 1000);
+    }
+
+    function update() {
+      const total = Math.max(1, parseInt($("totalPositions").value, 10) || 1);
+      const start = parseStart();
+      const duration = total * activeSeconds * 1000;
+      const end = new Date(start.getTime() + duration);
+      const elapsed = Math.max(0, Math.min(Date.now() - start.getTime(), duration));
+      const progress = duration > 0 ? elapsed / duration : 0;
+      const remaining = Math.max(0, duration - elapsed);
+      const hours = Math.floor(remaining / 3600000);
+      const minutes = Math.floor((remaining % 3600000) / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+      $("timer").textContent = [hours, minutes, seconds]
+        .map((value) => String(value).padStart(2, "0"))
+        .join(":");
+
+      const current = Date.now() < start.getTime()
+        ? 0
+        : Math.min(total, Math.floor(elapsed / (activeSeconds * 1000)) + 1);
+      $("scanCount").textContent = `${remaining <= 0 ? total : current} / ${total} Scan Positions`;
+      $("bar").style.width = `${progress * 100}%`;
+      $("percent").textContent = `${(progress * 100).toFixed(1)}% `;
+      $("finishTime").textContent = `Expected finish: ${end.toLocaleString(undefined, {
+        dateStyle: "medium",
+        timeStyle: "medium",
+      })}`;
+      $("container").classList.toggle("done", remaining <= 0);
+    }
+
+    function applyCurrentTiming(value, message) {
+      const seconds = Number(value);
+      if (!Number.isFinite(seconds) || seconds <= 0) {
+        $("timingStatus").textContent = "Please enter a timing greater than zero.";
+        return false;
       }
+      activeSeconds = seconds;
+      $("secondsPerPosition").value = String(seconds);
+      saveSettings();
+      update();
+      $("timingStatus").textContent = message || `Current timing saved: ${activeSeconds.toFixed(4)} s per position.`;
+      return true;
+    }
 
-      function localInputValue(date) {
-        const p = (number) => String(number).padStart(2, "0");
-        return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}T${p(date.getHours())}:${p(date.getMinutes())}:${p(date.getSeconds())}`;
-      }
-
-      function parseStart() {
-        const date = new Date($("startTime").value);
-        return Number.isNaN(date.getTime()) ? new Date() : date;
-      }
-
-      function getTimingDuration() {
-        return (
-          Math.max(0, parseInt($("timingMinutes").value, 10) || 0) * 60 +
-          Math.max(0, parseInt($("timingSeconds").value, 10) || 0) +
-          Math.max(0, parseInt($("timingMilliseconds").value, 10) || 0) / 1000
-        );
-      }
-
-      function setTimingDuration(totalSeconds) {
-        const total = Math.max(0, Number(totalSeconds) || 0);
-        $("timingMinutes").value = Math.floor(total / 60);
-        $("timingSeconds").value = Math.floor(total % 60);
-        $("timingMilliseconds").value = Math.round((total - Math.floor(total)) * 1000)
-          .toString()
-          .padStart(3, "0");
-      }
-
-      function renderStopwatch(milliseconds) {
-        const minutes = Math.floor(milliseconds / 60000);
-        const seconds = Math.floor((milliseconds % 60000) / 1000);
-        const millis = Math.floor(milliseconds % 1000);
-        $("stopwatchStatus").textContent =
-          `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(millis).padStart(3, "0")}`;
-        setTimingDuration(milliseconds / 1000);
-      }
-
-      function update() {
-        const total = Math.max(1, parseInt($("totalPositions").value, 10) || 1);
-        const start = parseStart();
-        const duration = total * activeSeconds * 1000;
-        const end = new Date(start.getTime() + duration);
-        const elapsed = Math.max(0, Math.min(Date.now() - start.getTime(), duration));
-        const progress = duration > 0 ? elapsed / duration : 0;
-        const remaining = Math.max(0, duration - elapsed);
-        const hours = Math.floor(remaining / 3600000);
-        const minutes = Math.floor((remaining % 3600000) / 60000);
-        const seconds = Math.floor((remaining % 60000) / 1000);
-        $("timer").textContent = [hours, minutes, seconds]
-          .map((value) => String(value).padStart(2, "0"))
-          .join(":");
-
-        const current = Date.now() < start.getTime()
-          ? 0
-          : Math.min(total, Math.floor(elapsed / (activeSeconds * 1000)) + 1);
-        $("scanCount").textContent = `${remaining <= 0 ? total : current} / ${total} Scan Positions`;
-        $("bar").style.width = `${progress * 100}%`;
-        $("percent").textContent = `${(progress * 100).toFixed(1)}% complete`;
-        $("finishTime").textContent = `Expected finish: ${end.toLocaleString(undefined, {
-          dateStyle: "medium",
-          timeStyle: "medium",
-        })}`;
-      }
-
-      function applyCurrentTiming(value, message) {
-        const seconds = Number(value);
-        if (!Number.isFinite(seconds) || seconds <= 0) {
-          $("timingStatus").textContent = "Please enter a timing greater than zero.";
-          return false;
-        }
-        activeSeconds = seconds;
-        $("secondsPerPosition").value = String(seconds);
+    ["startTime", "totalPositions"].forEach((id) => {
+      $(id).addEventListener("input", () => {
         saveSettings();
         update();
-        $("timingStatus").textContent = message || `Current timing saved: ${activeSeconds.toFixed(4)} s per position.`;
-        return true;
-      }
-
-      ["startTime", "totalPositions"].forEach((id) => {
-        $(id).addEventListener("input", () => {
-          saveSettings();
-          update();
-        });
-        $(id).addEventListener("change", () => {
-          saveSettings();
-          update();
-        });
       });
-
-      $("secondsPerPosition").addEventListener("change", () => {
-        applyCurrentTiming($("secondsPerPosition").value);
+      $(id).addEventListener("change", () => {
+        saveSettings();
+        update();
       });
+    });
 
-      $("startNow").onclick = () => {
-        $("startTime").value = localInputValue(new Date());
-        saveSettings();
-        update();
-      };
+    $("secondsPerPosition").addEventListener("change", () => {
+      applyCurrentTiming($("secondsPerPosition").value);
+    });
 
-      $("useBaseline").onclick = () => {
-        applyCurrentTiming(
-          BASELINE_SECONDS_PER_POSITION,
-          `Baseline timing applied: ${BASELINE_SECONDS_PER_POSITION.toFixed(2)} s per position.`,
-        );
-      };
+    $("startNow").onclick = () => {
+      $("startTime").value = localInputValue(new Date());
+      saveSettings();
+      update();
+    };
 
-      $("startTiming").onclick = () => {
-        stopwatchElapsed = 0;
-        stopwatchStartedAt = performance.now();
-        $("startTiming").disabled = true;
-        $("stopTiming").disabled = false;
-        clearInterval(stopwatchInterval);
-        stopwatchInterval = setInterval(() => {
-          renderStopwatch(stopwatchElapsed + performance.now() - stopwatchStartedAt);
-        }, 25);
-      };
+    $("startTiming").onclick = () => {
+      stopwatchElapsed = 0;
+      stopwatchStartedAt = performance.now();
+      $("startTiming").disabled = true;
+      $("stopTiming").disabled = false;
+      clearInterval(stopwatchInterval);
+      stopwatchInterval = setInterval(() => {
+        renderStopwatch(stopwatchElapsed + performance.now() - stopwatchStartedAt);
+      }, 25);
+    };
 
-      $("stopTiming").onclick = () => {
-        if (stopwatchInterval === null) return;
-        stopwatchElapsed += performance.now() - stopwatchStartedAt;
-        clearInterval(stopwatchInterval);
-        stopwatchInterval = null;
-        renderStopwatch(stopwatchElapsed);
-        $("startTiming").disabled = false;
-        $("stopTiming").disabled = true;
-      };
+    $("stopTiming").onclick = () => {
+      if (stopwatchInterval === null) return;
+      stopwatchElapsed += performance.now() - stopwatchStartedAt;
+      clearInterval(stopwatchInterval);
+      stopwatchInterval = null;
+      renderStopwatch(stopwatchElapsed);
+      $("startTiming").disabled = false;
+      $("stopTiming").disabled = true;
+    };
 
-      $("resetTiming").onclick = () => {
-        clearInterval(stopwatchInterval);
-        stopwatchInterval = null;
-        stopwatchElapsed = 0;
-        renderStopwatch(0);
-        $("startTiming").disabled = false;
-        $("stopTiming").disabled = true;
-      };
+    $("resetTiming").onclick = () => {
+      clearInterval(stopwatchInterval);
+      stopwatchInterval = null;
+      stopwatchElapsed = 0;
+      renderStopwatch(0);
+      $("startTiming").disabled = false;
+      $("stopTiming").disabled = true;
+    };
 
-      $("applyTiming").onclick = () => {
-        const scanIntervals = parseInt($("timedScans").value, 10);
-        const duration = getTimingDuration();
-        if (!(scanIntervals > 0 && duration > 0)) {
-          alert("Please enter a valid number of timed intervals and a total timing duration.");
-          return;
-        }
-        const secondsPerPosition = duration / scanIntervals;
-        applyCurrentTiming(
-          secondsPerPosition,
-          `${duration} s ÷ ${scanIntervals} intervals = ${secondsPerPosition.toFixed(4)} s per position. Saved.`,
-        );
-      };
-
-      $("clearTiming").onclick = () => {
-        $("timedScans").value = "";
-        setTimingDuration(0);
-        $("calculated").textContent = "Measured duration cleared. The current timing per position was not changed.";
-      };
-
-      function initialize() {
-        $("totalPositions").value = settings.totalPositions;
-        $("startTime").value = settings.startTime || localInputValue(new Date());
-        $("secondsPerPosition").value = String(activeSeconds);
-        saveSettings();
-        update();
-        timerInterval = setInterval(update, 1000);
+    $("applyTiming").onclick = () => {
+      const scanIntervals = parseInt($("timedScans").value, 10);
+      const duration = getTimingDuration();
+      if (!(scanIntervals > 0 && duration > 0)) {
+        alert("Please enter a valid number of timed intervals and a total timing duration.");
+        return;
       }
+      const secondsPerPosition = duration / scanIntervals;
+      applyCurrentTiming(
+        secondsPerPosition,
+        `${duration} s ÷ ${scanIntervals} intervals = ${secondsPerPosition.toFixed(4)} s per position. Saved.`,
+      );
+    };
 
-      initialize();
-    </script>
-  </body>
+    $("clearTiming").onclick = () => {
+      $("timedScans").value = "";
+      setTimingDuration(0);
+      $("calculated").textContent = "Measured duration cleared. The current timing per position was not changed.";
+    };
+
+    function initialize() {
+      $("totalPositions").value = settings.totalPositions;
+      $("startTime").value = settings.startTime || localInputValue(new Date());
+      $("secondsPerPosition").value = String(activeSeconds);
+      saveSettings();
+      update();
+      timerInterval = setInterval(update, 1000);
+    }
+
+    initialize();
+  </script>
+</body>
+
 </html>
