@@ -109,7 +109,7 @@
   </head>
   <body>
     <div class="container" id="container">
-      <div class="scan-type" id="scanType">Unloaded</div>
+      <div class="scan-type" id="scanType">Measurement</div>
       <div class="timer" id="timer">00:00:00</div>
       <div class="scan-count" id="scanCount">0 / 0 Scan Positions</div>
       <div class="progress"><div class="bar" id="bar"></div></div>
@@ -122,17 +122,9 @@
     <script>
       const $ = (id) => document.getElementById(id);
 
-      // Same localStorage keys and data structure as measurement_countdown.html.
-      const STORAGE_KEYS = [
-        "measurementSettings",
-        "scanTypes",
-        "selectedScanType",
-        "timingOverrides",
-      ];
-
-      const FALLBACK_TYPES = [
-        { name: "Could not load Server Presets", defaultSeconds: 19.25 },
-      ];
+      // The main app stores all three values in this single object.
+      const STORAGE_KEYS = ["measurementSettings"];
+      const BASELINE_SECONDS_PER_POSITION = 19.25;
 
       function load(key, fallback) {
         try {
@@ -144,30 +136,20 @@
 
       function getState() {
         const settings = load("measurementSettings", {});
-        const types = load("scanTypes", FALLBACK_TYPES);
-        const selectedName = localStorage.getItem("selectedScanType");
-        const selectedType =
-          (Array.isArray(types) &&
-            types.find((type) => type.name === selectedName)) ||
-          (Array.isArray(types) && types[0]) ||
-          FALLBACK_TYPES[0];
-
-        const overrides = load("timingOverrides", {});
-        const override = overrides?.[selectedType.name];
-        const seconds = Number(
-          override?.seconds || selectedType.defaultSeconds || 19.25,
-        );
+        const seconds = Number(settings.secondsPerPosition);
         const total = Math.max(
           1,
-          parseInt(settings.totalPositions, 10) || 0,
+          parseInt(settings.totalPositions, 10) || 2500,
         );
 
         let start = settings.startTime ? new Date(settings.startTime) : null;
         if (!start || Number.isNaN(start.getTime())) start = new Date();
 
         return {
-          typeName: selectedType.name,
-          seconds: seconds > 0 && Number.isFinite(seconds) ? seconds : 19.25,
+          seconds:
+            seconds > 0 && Number.isFinite(seconds)
+              ? seconds
+              : BASELINE_SECONDS_PER_POSITION,
           total,
           start,
         };
@@ -175,7 +157,6 @@
 
       function update() {
         const state = getState();
-        $("scanType").textContent = state.typeName;
 
         const duration = state.total * state.seconds * 1000;
         const end = new Date(state.start.getTime() + duration);
@@ -220,7 +201,7 @@
               : "";
       }
 
-      // The storage event updates immediately for changes made in another tab.
+      // Update immediately when measurementSettings changes in another tab.
       window.addEventListener("storage", (event) => {
         if (!event.key || STORAGE_KEYS.includes(event.key)) update();
       });
